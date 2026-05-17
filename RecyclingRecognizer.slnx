@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="RecyclingRecognizer.Core/RecyclingRecognizer.Core.csproj" />
+  <Project Path="RecyclingRecognizer.Tests/RecyclingRecognizer.Tests.csproj" />
+</Solution>
