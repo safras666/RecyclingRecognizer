@@ -1,4 +1,6 @@
 <Solution>
+  <Project Path="RecyclingRecognizer.AppNet/RecyclingRecognizer.AppNet.csproj" Id="3a4ba3a5-7673-4971-88c6-e3d15581c0c7" />
   <Project Path="RecyclingRecognizer.Core/RecyclingRecognizer.Core.csproj" />
   <Project Path="RecyclingRecognizer.Tests/RecyclingRecognizer.Tests.csproj" />
+  <Project Path="RecyclingRecognizer.UITests/RecyclingRecognizer.UITests.csproj" Id="a8d9c8b0-192f-46ca-84bb-157e3952552b" />
 </Solution>
