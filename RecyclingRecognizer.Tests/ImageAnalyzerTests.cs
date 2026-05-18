@@ -12,9 +12,9 @@ namespace RecyclingRecognizer.Tests
         [SetUp]
         public void Setup()
         {
-
-            var stubLoader = new StubFileLoader();
-            _analyzer = new ImageAnalyzer(stubLoader);
+            // Используем тестовый двойник для IRecognitionEngine
+            var stubEngine = new StubRecognitionEngine();
+            _analyzer = new ImageAnalyzer(stubEngine);
         }
 
         // Тест 001: позитивный сценарий с кодом "1"
@@ -22,13 +22,12 @@ namespace RecyclingRecognizer.Tests
         public void T001_Analyze_ValidPhotoWithCode1_ReturnsSuccess()
         {
             string imagePath = "valid_symbol_1.png";
-            AnalysisResult result = null;
-            Assert.DoesNotThrow(() => { result = _analyzer.Analyze(imagePath); });
+            var result = _analyzer.Analyze(imagePath);
             Assert.That(result.Success, Is.True);
             Assert.That(result.SymbolCode, Is.EqualTo("1"));
         }
 
-        // Тест 002: пустой путь — исключение
+        // Тест 002: null путь — исключение
         [Test]
         public void T002_Analyze_NullPath_ThrowsArgumentNullException()
         {
@@ -75,13 +74,32 @@ namespace RecyclingRecognizer.Tests
             Assert.That(result.SymbolCode, Is.EqualTo(expectedCode));
         }
 
-        // Тест 007
+        // Тест 007: проверка возможности внедрения заглушки
         [Test]
-        public void Analyze_StubLoaderCanBeInjected_DoesNotThrow()
+        public void Analyze_StubEngineCanBeInjected_DoesNotThrow()
         {
-            var stubLoader = new StubFileLoader();
-            var analyzer = new ImageAnalyzer(stubLoader);
+            var stubEngine = new StubRecognitionEngine();
+            var analyzer = new ImageAnalyzer(stubEngine);
             Assert.DoesNotThrow(() => analyzer.Analyze("valid_symbol_1.png"));
+        }
+
+        // Тесты на новые проверки валидации
+        [Test]
+        public void Analyze_EmptyPath_ThrowsArgumentException()
+        {
+            Assert.Throws<ArgumentException>(() => _analyzer.Analyze(""));
+        }
+
+        [Test]
+        public void Analyze_PathWithInvalidChars_ThrowsArgumentException()
+        {
+            Assert.Throws<ArgumentException>(() => _analyzer.Analyze("file?.png"));
+        }
+
+        [Test]
+        public void Analyze_WrongExtension_ThrowsArgumentException()
+        {
+            Assert.Throws<ArgumentException>(() => _analyzer.Analyze("image.bmp"));
         }
     }
 }

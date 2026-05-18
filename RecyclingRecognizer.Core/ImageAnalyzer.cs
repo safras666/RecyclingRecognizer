@@ -1,67 +1,39 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using static System.Net.Mime.MediaTypeNames;
-
+using System.IO;
+using System.Linq;
 
 namespace RecyclingRecognizer.Core
 {
     public class ImageAnalyzer
     {
-        private readonly IFileLoader _fileLoader;
+        private readonly IRecognitionEngine _recognitionEngine;
 
-        public ImageAnalyzer(IFileLoader fileLoader)
+        public ImageAnalyzer(IRecognitionEngine recognitionEngine)
         {
-            _fileLoader = fileLoader;
+            _recognitionEngine = recognitionEngine;
         }
 
         public AnalysisResult Analyze(string imagePath)
         {
+            // 1. Проверка на null
             if (imagePath == null)
                 throw new ArgumentNullException(nameof(imagePath));
 
-            if (imagePath.Contains("corrupted"))
-                throw new InvalidOperationException("Изображение повреждено");
+            // 2. Проверка на пустую строку или только пробелы
+            if (string.IsNullOrWhiteSpace(imagePath))
+                throw new ArgumentException("Путь к изображению не может быть пустым", nameof(imagePath));
 
-            if (imagePath.Contains("no_symbol"))
-            {
-                return new AnalysisResult
-                {
-                    Success = false,
-                    SymbolCode = "",
-                    Message = "Значок не найден"
-                };
-            }
+            // 3. Проверка на недопустимые символы в пути
+            char[] invalidChars = Path.GetInvalidPathChars();
+            if (imagePath.IndexOfAny(invalidChars) != -1)
+                throw new ArgumentException("Путь содержит недопустимые символы", nameof(imagePath));
 
-            if (imagePath.Contains("unreadable"))
-            {
-                return new AnalysisResult
-                {
-                    Success = false,
-                    SymbolCode = "",
-                    Message = "Не удалось определить код значка"
-                };
-            }
+            // 4. Проверка на валидность ссылки (простейшая — наличие расширения .png/.jpg и т.п.)
+            string extension = Path.GetExtension(imagePath).ToLower();
+            if (extension != ".png" && extension != ".jpg" && extension != ".jpeg")
+                throw new ArgumentException("Файл должен иметь расширение .png, .jpg или .jpeg", nameof(imagePath));
 
-            if (imagePath.Contains("valid_symbol_"))
-            {
-                string fileName = System.IO.Path.GetFileNameWithoutExtension(imagePath);
-                string[] parts = fileName.Split('_');
-                string code = parts[parts.Length - 1];
-                return new AnalysisResult
-                {
-                    Success = true,
-                    SymbolCode = code,
-                    Message = "Распознано успешно"
-                };
-            }
-
-            return new AnalysisResult
-            {
-                Success = false,
-                SymbolCode = "",
-                Message = "Значок не найден"
-            };
+            return _recognitionEngine.Recognize(imagePath);
         }
     }
 }
