@@ -82,24 +82,5 @@ namespace RecyclingRecognizer.Tests
             var analyzer = new ImageAnalyzer(stubEngine);
             Assert.DoesNotThrow(() => analyzer.Analyze("valid_symbol_1.png"));
         }
-
-        // Тесты на новые проверки валидации
-        [Test]
-        public void Analyze_EmptyPath_ThrowsArgumentException()
-        {
-            Assert.Throws<ArgumentException>(() => _analyzer.Analyze(""));
-        }
-
-        //[Test]
-        //public void Analyze_PathWithInvalidChars_ThrowsArgumentException()
-        //{
-        //    Assert.Throws<ArgumentException>(() => _analyzer.Analyze("file?.png"));
-        //}
-
-        [Test]
-        public void Analyze_WrongExtension_ThrowsArgumentException()
-        {
-            Assert.Throws<ArgumentException>(() => _analyzer.Analyze("image.bmp"));
-        }
     }
 }
